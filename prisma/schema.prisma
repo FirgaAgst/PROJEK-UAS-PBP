@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model admins {
+  AdminID   Int     @id @default(autoincrement())
+  UserID    Int
+  AdminName String? @db.VarChar(100)
+  users     users   @relation(fields: [UserID], references: [UserID], onDelete: Cascade, onUpdate: Restrict, map: "admins_ibfk_1")
+
+  @@index([UserID], map: "UserID")
+}
+
+model menus {
+  MenuID   Int            @id @default(autoincrement())
+  MenuName String         @db.VarChar(100)
+  Category menus_Category
+  Price    Decimal        @db.Decimal(10, 2)
+}
+
+model reservations {
+  ReservationID   Int                  @id @default(autoincrement())
+  UserID          Int
+  TableID         Int
+  ReservationDate DateTime             @db.Date
+  NumberOfGuests  Int
+  Status          reservations_Status? @default(pending)
+  users           users                @relation(fields: [UserID], references: [UserID], onDelete: Cascade, onUpdate: Restrict, map: "reservations_ibfk_1")
+  tables          tables               @relation(fields: [TableID], references: [TableID], onDelete: Cascade, onUpdate: Restrict, map: "reservations_ibfk_2")
+  reviews         reviews[]
+
+  @@index([TableID], map: "TableID")
+  @@index([UserID], map: "UserID")
+}
+
+model reviews {
+  ReviewID      Int           @id @default(autoincrement())
+  UserID        Int
+  ReservationID Int?
+  Rating        Int?
+  Comment       String?       @db.VarChar(255)
+  ReviewDate    DateTime      @default(dbgenerated("(curdate())")) @db.Date
+  users         users         @relation(fields: [UserID], references: [UserID], onDelete: Cascade, onUpdate: Restrict, map: "reviews_ibfk_1")
+  reservations  reservations? @relation(fields: [ReservationID], references: [ReservationID], onUpdate: Restrict, map: "reviews_ibfk_2")
+
+  @@index([ReservationID], map: "ReservationID")
+  @@index([UserID], map: "UserID")
+}
+
+model tables {
+  TableID      Int            @id @default(autoincrement())
+  TableNumber  Int            @unique(map: "TableNumber")
+  Capacity     Int
+  reservations reservations[]
+}
+
+model users {
+  UserID       Int            @id @default(autoincrement())
+  Username     String         @unique(map: "Username") @db.VarChar(50)
+  Password     String         @db.VarChar(255)
+  Email        String         @unique(map: "Email") @db.VarChar(100)
+  Role         users_Role
+  admins       admins[]
+  reservations reservations[]
+  reviews      reviews[]
+}
+
+enum menus_Category {
+  food
+  drink
+  dessert
+}
+
+enum users_Role {
+  user
+  admin
+}
+
+enum reservations_Status {
+  pending
+  confirmed
+  cancelled
+}

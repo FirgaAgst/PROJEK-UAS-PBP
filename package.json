@@ -1,0 +1,22 @@
+{
+  "name": "projek-uas",
+  "version": "1.0.0",
+  "main": "app.js",
+ "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.2.1",
+    "bcrypt": "^5.1.1",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "jest": "^29.7.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.12.0",
+    "prisma": "^6.2.1"
+  }
+}
